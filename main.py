@@ -44,7 +44,7 @@ for event in longpoll.listen():
     if event.type == VkEventType.USER_TYPING and event.user_id != admin and event.user_id*-1 not in mutel:
         vk.messages.send(user_id=event.user_id,
                          random_id=get_random_id(),
-                         message="Чё пишешь, выблядок(Очка)?")
+                         message="Чё пишешь, выбляд_Очка?")
     if event.type == VkEventType.MESSAGE_NEW and ((event.chat_id if event.from_chat else event.user_id*-1) not in mutel or event.user_id == admin):
         x = (vk.messages.getById(message_ids=event.message_id, preview_length=0)['items'])[0]
         if event.user_id == hid and not event.from_me:
@@ -190,39 +190,88 @@ for event in longpoll.listen():
                                          message="added")
                 elif adcmdl[3] == event.text.lower():
                     if x['fwd_messages'] != {}:
-                        datatxt = open('data.txt', 'a')
+                        datatxt = open('data.txt', 'w')
                         for i in x['fwd_messages']:
                             print(i['from_id'])
                             mutel.append(i['from_id']*-1)
-                            datatxt.write(str(i['from_id']*-1) + '\n')
+                        mutel = list(set(mutel))
+                        lines = token + '\n' + '\n'.join(map(str, mutel)) + '\n'
+                        datatxt.writelines(lines)
                         datatxt.close()
                     else:
-                        datatxt = open('data.txt', 'a')
+                        datatxt = open('data.txt', 'w')
                         mutel.append(event.chat_id)
-                        datatxt.write(str(event.chat_id)+'\n')
+                        mutel = list(set(mutel))
+                        lines = token + '\n' + '\n'.join(map(str, mutel)) + '\n'
+                        datatxt.writelines(lines)
                         datatxt.close()
+                    if event.from_user:
+                        vk.messages.send(user_id=event.user_id,
+                                         random_id=get_random_id(),
+                                         message="added")
+                    elif event.from_chat:
+                        vk.messages.send(chat_id=event.chat_id,
+                                         random_id=get_random_id(),
+                                         message="added")
                 elif adcmdl[4] == event.text.lower():
                     if x['fwd_messages'] != {}:
+                        lines = token + '\n'
                         datatxt = open('data.txt', 'w')
                         for i in x['fwd_messages']:
-                            mutel.remove(i['from_id']*-1)
+                            try:
+                                mutel.remove(i['from_id']*-1)
+                            except ValueError:
+                                if event.from_user:
+                                    vk.messages.send(user_id=event.user_id,
+                                                     random_id=get_random_id(),
+                                                     message=f"@id{i['from_id']} is not in the mute list")
+                                elif event.from_chat:
+                                    vk.messages.send(chat_id=event.chat_id,
+                                                     random_id=get_random_id(),
+                                                     message=f"@id{i['from_id']} is not in the mute list")
+                            else:
+                                if event.from_user:
+                                    vk.messages.send(user_id=event.user_id,
+                                                     random_id=get_random_id(),
+                                                     message="deleted")
+                                elif event.from_chat:
+                                    vk.messages.send(chat_id=event.chat_id,
+                                                     random_id=get_random_id(),
+                                                     message="deleted")
+                        mutelstr = map(str, mutel)
+                        if len(mutel) > 0:
+                            lines += '\n'.join(mutelstr) + '\n'
+                        datatxt.writelines(lines)
+                        datatxt.close()
+                    else:
+                        try:
+                            mutel.remove(event.chat_id)
+                        except ValueError:
+                            if event.from_user:
+                                vk.messages.send(user_id=event.user_id,
+                                                 random_id=get_random_id(),
+                                                 message=f"chat{event.chat_id} is not in the mute list")
+                            elif event.from_chat:
+                                vk.messages.send(chat_id=event.chat_id,
+                                                 random_id=get_random_id(),
+                                                 message=f"chat{event.chat_id} is not in the mute list")
+                        else:
+                            datatxt = open('data.txt', 'w')
                             mutelstr = map(str, mutel)
-                            if len(mutel)>0:
+                            if len(mutel) > 0:
                                 lines = token + '\n' + '\n'.join(mutelstr) + '\n'
                             else:
                                 lines = token + '\n'
-                        datatxt.writelines(lines)
-                        datatxt.close()
-                    else:
-                        datatxt = open('data.txt', 'w')
-                        mutel.remove(event.chat_id)
-                        mutelstr = map(str, mutel)
-                        if len(mutel)>0:
-                            lines = token + '\n' + '\n'.join(mutelstr) + '\n'
-                        else:
-                            lines = token + '\n'
-                        datatxt.writelines(lines)
-                        datatxt.close()
+                            datatxt.writelines(lines)
+                            datatxt.close()
+                            if event.from_user:
+                                vk.messages.send(user_id=event.user_id,
+                                                 random_id=get_random_id(),
+                                                 message="deleted")
+                            elif event.from_chat:
+                                vk.messages.send(chat_id=event.chat_id,
+                                                 random_id=get_random_id(),
+                                                 message="deleted")
                 elif event.text[0] == "~":
                     try:
                         a = eval(event.text[1:])
