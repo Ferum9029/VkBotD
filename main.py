@@ -5,6 +5,7 @@ import vk_api
 import random
 import requests
 import sys
+from bs4 import BeautifulSoup
 import time
 def Image_DownLoad(data, count):
     x = 0
@@ -27,19 +28,20 @@ datatxt = open('data.txt', 'r')
 token = str(datatxt.readline()[:-1])
 vk_session = vk_api.VkApi(token=token)
 cmdl = ['commandlist', 'ok, boomer', '~hate', '~donthate', 'справедливо', '~getmeme']
-adcmdl = ['~die', '~addphrase', '~addmeme', '~addmute', '~delmute']
+adcmdl = ['~die', '~addphrase', '~addmeme', '~addmute', '~delmute', 'da']
 mutel = list(map(int, datatxt.readlines()[0:]))
-adnicks = ['ferum', 'ferrum']
+adnicks = ['ferum', 'ferrum', '@ferwild']
 datatxt.close()
+Itself = 483032191
 admin = 107442155
 hid = 0
-Itself = 496547736
 Valeria = 559330337
 counttxt = open('count.txt', mode='r')
 count = int(counttxt.readline())
 counttxt.close()
 vk = vk_session.get_api()
 longpoll = VkLongPoll(vk_session)
+
 for event in longpoll.listen():
     if event.type == VkEventType.USER_TYPING and event.user_id != admin and event.user_id*-1 not in mutel:
         vk.messages.send(user_id=event.user_id,
@@ -120,7 +122,7 @@ for event in longpoll.listen():
                                      random_id=get_random_id(),
                                      message="Ok",
                                      reply_to=event.message_id)
-                if event.from_chat:
+                elif event.from_chat:
                     vk.messages.send(chat_id=event.chat_id,
                                      random_id=get_random_id(),
                                      message="Ok",
@@ -142,7 +144,17 @@ for event in longpoll.listen():
                                      sticker_id=163,
                                      reply_to=event.message_id)
             elif event.text.lower() == cmdl[5]:
-                meme = VkUpload(vk).photo_messages(photos=f'E:\VkBotD\memes\meme ({random.randint(1,2220)}).jpg')
+                meme = VkUpload(vk).photo_messages(photos=f'E:\VkBotD\memes\meme ({random.randint(1,count)}).jpg')
+                if event.from_user:
+                    vk.messages.send(user_id=event.user_id,
+                                     random_id=get_random_id(),
+                                     attachment=f'photo{meme[0]["owner_id"]}_{meme[0]["id"]}')
+                elif event.from_chat:
+                    vk.messages.send(chat_id=event.chat_id,
+                                     random_id=get_random_id(),
+                                     attachment=f'photo{meme[0]["owner_id"]}_{meme[0]["id"]}')
+            elif event.text.lower() == 'send last meme':
+                meme = VkUpload(vk).photo_messages(photos=f'E:\VkBotD\memes\meme ({count}).jpg')
                 if event.from_user:
                     vk.messages.send(user_id=event.user_id,
                                      random_id=get_random_id(),
@@ -272,6 +284,11 @@ for event in longpoll.listen():
                                 vk.messages.send(chat_id=event.chat_id,
                                                  random_id=get_random_id(),
                                                  message="deleted")
+                elif adcmdl[5] == event.text.lower():
+                    r = requests.get('https://m.vk.com/audio496547736_456239026_218cda37cb6e27eb39')
+                    out = open(f'E:\VkBotD\yeah.txt', "wb")
+                    out.write(r.content)
+                    out.close()
                 elif event.text[0] == "~":
                     try:
                         a = eval(event.text[1:])
@@ -295,7 +312,20 @@ for event in longpoll.listen():
                             vk.messages.send(chat_id=event.chat_id,
                                              random_id=get_random_id(),
                                              message='Done')
+            elif event.message_id % 100 == 0:
+                f = open('DPhrases.txt', mode='r', encoding='utf-8')
+                phrases = f.readlines()
+                if event.from_user:
+                    vk.messages.send(user_id=event.user_id,
+                                     random_id=get_random_id(),
+                                     message=phrases[random.randint(0, len(phrases) - 1)])
+                elif event.from_chat:
+                    vk.messages.send(chat_id=event.chat_id,
+                                     random_id=get_random_id(),
+                                     message=phrases[random.randint(0, len(phrases) - 1)])
+                f.close()
             elif event.from_user:
                 vk.messages.sendSticker(user_id=event.user_id,
                                         random_id=get_random_id(),
                                         sticker_id=163)
+        print(event.text, event.message_id)
