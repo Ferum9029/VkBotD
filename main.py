@@ -5,8 +5,9 @@ import vk_api
 import random
 import requests
 import sys
-from bs4 import BeautifulSoup
 import time
+
+
 def Image_DownLoad(data, count):
     x = 0
     url_img = ''
@@ -16,7 +17,7 @@ def Image_DownLoad(data, count):
             x = u['width']
             url_img = u['url']
     r = requests.get(url_img)
-    out = open(f'E:\VkBotD\memes\meme ({count + 1}).jpg', "wb")
+    out = open(f'E:\\VkBotD\\memes\\meme ({count + 1}).jpg', "wb")
     out.write(r.content)
     out.close()
     count += 1
@@ -24,7 +25,8 @@ def Image_DownLoad(data, count):
     counttxt.writelines(str(count))
     counttxt.close()
 
-datatxt = open('data.txt', 'r')
+
+datatxt = open('e:\\VkbotD\\data.txt', 'r')
 token = str(datatxt.readline()[:-1])
 vk_session = vk_api.VkApi(token=token)
 cmdl = ['commandlist', 'ok, boomer', '~hate', '~donthate', 'справедливо', '~getmeme']
@@ -36,7 +38,7 @@ Itself = 483032191
 admin = 107442155
 hid = 0
 Valeria = 559330337
-counttxt = open('count.txt', mode='r')
+counttxt = open('e:\\VkbotD\\count.txt', mode='r')
 count = int(counttxt.readline())
 counttxt.close()
 vk = vk_session.get_api()
@@ -144,7 +146,7 @@ for event in longpoll.listen():
                                      sticker_id=163,
                                      reply_to=event.message_id)
             elif event.text.lower() == cmdl[5]:
-                meme = VkUpload(vk).photo_messages(photos=f'E:\VkBotD\memes\meme ({random.randint(1,count)}).jpg')
+                meme = VkUpload(vk).photo_messages(photos=f'E:\\VkBotD\\memes\\meme ({random.randint(1,count)}).jpg')
                 if event.from_user:
                     vk.messages.send(user_id=event.user_id,
                                      random_id=get_random_id(),
@@ -154,7 +156,7 @@ for event in longpoll.listen():
                                      random_id=get_random_id(),
                                      attachment=f'photo{meme[0]["owner_id"]}_{meme[0]["id"]}')
             elif event.text.lower() == 'send last meme':
-                meme = VkUpload(vk).photo_messages(photos=f'E:\VkBotD\memes\meme ({count}).jpg')
+                meme = VkUpload(vk).photo_messages(photos=f'E:\\VkBotD\\memes\\meme ({count}).jpg')
                 if event.from_user:
                     vk.messages.send(user_id=event.user_id,
                                      random_id=get_random_id(),
@@ -176,7 +178,7 @@ for event in longpoll.listen():
                     print("adcmdl[0]")
                     break
                 elif adcmdl[1] in event.text.lower():
-                    f = open('HPhrases.txt', mode='a', encoding='utf-8')
+                    f = open('e:\\VkbotD\\HPhrases.txt', mode='a', encoding='utf-8')
                     hphrase = event.text[len(adcmdl[1])+1:]
                     f.write('\n'+hphrase)
                     f.close()
@@ -202,7 +204,7 @@ for event in longpoll.listen():
                                          message="added")
                 elif adcmdl[3] == event.text.lower():
                     if x['fwd_messages'] != {}:
-                        datatxt = open('data.txt', 'w')
+                        datatxt = open('e:\\VkbotD\\data.txt', 'w')
                         for i in x['fwd_messages']:
                             print(i['from_id'])
                             mutel.append(i['from_id']*-1)
@@ -211,7 +213,7 @@ for event in longpoll.listen():
                         datatxt.writelines(lines)
                         datatxt.close()
                     else:
-                        datatxt = open('data.txt', 'w')
+                        datatxt = open('e:\\VkbotD\\data.txt', 'w')
                         mutel.append(event.chat_id)
                         mutel = list(set(mutel))
                         lines = token + '\n' + '\n'.join(map(str, mutel)) + '\n'
@@ -228,7 +230,7 @@ for event in longpoll.listen():
                 elif adcmdl[4] == event.text.lower():
                     if x['fwd_messages'] != {}:
                         lines = token + '\n'
-                        datatxt = open('data.txt', 'w')
+                        datatxt = open('e:\\VkbotD\\data.txt', 'w')
                         for i in x['fwd_messages']:
                             try:
                                 mutel.remove(i['from_id']*-1)
@@ -268,7 +270,7 @@ for event in longpoll.listen():
                                                  random_id=get_random_id(),
                                                  message=f"chat{event.chat_id} is not in the mute list")
                         else:
-                            datatxt = open('data.txt', 'w')
+                            datatxt = open('e:\\VkbotD\\data.txt', 'w')
                             mutelstr = map(str, mutel)
                             if len(mutel) > 0:
                                 lines = token + '\n' + '\n'.join(mutelstr) + '\n'
@@ -285,8 +287,8 @@ for event in longpoll.listen():
                                                  random_id=get_random_id(),
                                                  message="deleted")
                 elif adcmdl[5] == event.text.lower():
-                    r = requests.get('https://m.vk.com/audio496547736_456239026_218cda37cb6e27eb39')
-                    out = open(f'E:\VkBotD\yeah.txt', "wb")
+                    r = requests.get('https://m.vk.com/audio496547736_456239026_218cda37cb627eb39e')
+                    out = open(f'E:\\VkBotD\\yeah.txt', "wb")
                     out.write(r.content)
                     out.close()
                 elif event.text[0] == "~":
@@ -313,7 +315,7 @@ for event in longpoll.listen():
                                              random_id=get_random_id(),
                                              message='Done')
             elif event.message_id % 100 == 0:
-                f = open('DPhrases.txt', mode='r', encoding='utf-8')
+                f = open('e:\\VkbotD\\DPhrases.txt', mode='r', encoding='utf-8')
                 phrases = f.readlines()
                 if event.from_user:
                     vk.messages.send(user_id=event.user_id,
@@ -329,3 +331,4 @@ for event in longpoll.listen():
                                         random_id=get_random_id(),
                                         sticker_id=163)
         print(event.text, event.message_id)
+    time.sleep(0.2)
